@@ -1,6 +1,7 @@
 package ai.tomorrow.codechallenge_kotlin.model
 
 import androidx.room.Entity
+import androidx.room.PrimaryKey
 
 data class To(
     val id: String,
@@ -31,6 +32,7 @@ data class DatabaseMessage(
     val toName: String,
     val fromId: String,
     val fromName: String,
+    @PrimaryKey
     val timestamp: Long,
     val areFriends: Boolean
 )
