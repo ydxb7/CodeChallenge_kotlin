@@ -1,5 +1,6 @@
 package ai.tomorrow.codechallenge_kotlin.utils
 
+import ai.tomorrow.codechallenge_kotlin.model.DatabaseMessage
 import android.net.NetworkInfo
 
 interface DownloadCallback {
@@ -23,7 +24,7 @@ interface DownloadCallback {
      * Indicates that the callback handler needs to update its appearance or information based on
      * the result of the task. Expected to be called from the main thread.
      */
-    fun updateFromDownload(result: String?)
+    fun updateFromDownload(result: List<DatabaseMessage>?)
 
     /**
      * Indicate to callback handler any progress update.
@@ -38,4 +39,10 @@ interface DownloadCallback {
      */
     fun finishDownloading()
 
+}
+
+
+sealed class Result<R, E : Exception> {
+    class Success<R, E : Exception>(val value: R) : Result<R, E>()
+    class Failure<R, E : Exception>(val error: E) : Result<R, E>()
 }

@@ -12,6 +12,11 @@ data class From(
     val name: String
 )
 
+data class User(
+    val id: String,
+    val name: String
+)
+
 data class NetworkMessage(
     val to: To,
     val from: From,

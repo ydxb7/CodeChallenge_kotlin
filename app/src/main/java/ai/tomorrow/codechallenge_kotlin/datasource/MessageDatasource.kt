@@ -1,19 +1,27 @@
 package ai.tomorrow.codechallenge_kotlin.datasource
 
+import ai.tomorrow.codechallenge_kotlin.model.DatabaseMessage
+import ai.tomorrow.codechallenge_kotlin.model.User
 import ai.tomorrow.codechallenge_kotlin.utils.DownloadCallback
 import android.app.Application
 import android.net.ConnectivityManager
 import android.os.AsyncTask
+import android.util.JsonReader
+import android.util.Log
 import java.io.IOException
 import java.io.InputStream
 import java.io.InputStreamReader
 import java.net.URL
 import javax.net.ssl.HttpsURLConnection
 
-//const val CODE_CHALLENGE_URL = "https://codechallenge.secrethouse.party/"
-const val CODE_CHALLENGE_URL = "https://www.google.com"
+
+const val CODE_CHALLENGE_URL = "https://codechallenge.secrethouse.party/"
+const val MASSAGE_NUM = 200
+//const val CODE_CHALLENGE_URL = "https://www.google.com"
 
 class MessageDatasource(application: Application) {
+
+    private val TAG = "MessageDatasource"
 
     private var mDownloadTask: DownloadTask? = null
 
@@ -31,20 +39,8 @@ class MessageDatasource(application: Application) {
     }
 
     private inner class DownloadTask(val mCallback: DownloadCallback) :
-        AsyncTask<String, Int, DownloadTask.Result>() {
+        AsyncTask<String, Int, List<DatabaseMessage>>() {
 
-        internal inner class Result {
-            var mResultValue: String? = null
-            var mException: Exception? = null
-
-            constructor(resultValue: String) {
-                mResultValue = resultValue
-            }
-
-            constructor(exception: Exception) {
-                mException = exception
-            }
-        }
 
         override fun onPreExecute() {
             if (mCallback != null) {
@@ -59,22 +55,15 @@ class MessageDatasource(application: Application) {
             }
         }
 
-        override fun doInBackground(vararg urls: String): Result? {
-            var result: Result? = null
+        override fun doInBackground(vararg urls: String): List<DatabaseMessage>? {
+            var result: List<DatabaseMessage>? = null
             if (!isCancelled && urls != null && urls.size > 0) {
                 val urlString = urls[0]
-                try {
-                    val url = URL(urlString)
-                    val resultString = downloadUrl(url)
-                    if (resultString != null) {
-                        result = Result(resultString)
-                    } else {
-                        throw IOException("No response received.")
-                    }
-                } catch (e: Exception) {
-                    result = Result(e)
+                val url = URL(urlString)
+                val resultMessages = downloadUrl(url)
+                if (resultMessages != null) {
+                    result = resultMessages
                 }
-
             }
             return result
         }
@@ -86,24 +75,23 @@ class MessageDatasource(application: Application) {
             }
         }
 
-        override fun onPostExecute(result: Result?) {
-            if (result != null && mCallback != null) {
-                if (result.mException != null) {
-                    mCallback.updateFromDownload(result.mException!!.message)
-                } else if (result.mResultValue != null) {
-                    mCallback.updateFromDownload(result.mResultValue)
-                }
-                mCallback.finishDownloading()
-            }
+        override fun onPostExecute(result: List<DatabaseMessage>?) {
+
+            mCallback.updateFromDownload(result)
+
+            mCallback.finishDownloading()
         }
 
-        override fun onCancelled(result: Result) {}
+
+        override fun onCancelled(result: List<DatabaseMessage>?) {}
 
         @Throws(IOException::class)
-        private fun downloadUrl(url: URL): String? {
+        private fun downloadUrl(url: URL): List<DatabaseMessage>? {
             var stream: InputStream? = null
             var connection: HttpsURLConnection? = null
-            var result: String? = null
+            val messages = ArrayList<DatabaseMessage>()
+            var num = 0
+//            var result: String? = null
             try {
                 connection = url.openConnection() as HttpsURLConnection
                 // Timeout for reading InputStream arbitrarily set to 3000ms.
@@ -126,8 +114,27 @@ class MessageDatasource(application: Application) {
                 stream = connection.inputStream
                 publishProgress(DownloadCallback.Progress.GET_INPUT_STREAM_SUCCESS, 0)
                 if (stream != null) {
-                    // Converts Stream to String with max length of 500.
-                    result = readStream(stream, 500)
+                    val reader = JsonReader(InputStreamReader(stream, "UTF-8"))
+                    reader.isLenient = true
+                    try {
+//                        reader.beginObject()
+                        while (reader.hasNext() && num++ < MASSAGE_NUM) {
+                            val message = readMessage(reader)
+                            if (message != null) {
+                                messages.add(message)
+                            }
+                            Log.d(TAG, "messages.size = ${messages.size}")
+                            Log.d(TAG, "messages = $message")
+                        }
+//                        reader.endObject()
+                    } catch (e: IOException) {
+                        Log.e(TAG, "Problem reading messages objects")
+                    } finally {
+                        reader.close()
+                    }
+
+
+//                    result = readStream(stream, 500)
                     publishProgress(DownloadCallback.Progress.PROCESS_INPUT_STREAM_SUCCESS, 0)
                 }
             } finally {
@@ -135,34 +142,102 @@ class MessageDatasource(application: Application) {
                 stream?.close()
                 connection?.disconnect()
             }
-            return result
+            return messages
         }
 
         @Throws(IOException::class)
-        private fun readStream(stream: InputStream, maxLength: Int): String? {
-            var result: String? = null
-            // Read InputStream using the UTF-8 charset.
-            val reader = InputStreamReader(stream, "UTF-8")
-            // Create temporary buffer to hold Stream data with specified max length.
-            val buffer = CharArray(maxLength)
-            // Populate temporary buffer with Stream data.
-            var numChars = 0
-            var readSize = 0
-            while (numChars < maxLength && readSize != -1) {
-                numChars += readSize
-                val pct = 100 * numChars / maxLength
-                publishProgress(DownloadCallback.Progress.PROCESS_INPUT_STREAM_IN_PROGRESS, pct)
-                readSize = reader.read(buffer, numChars, buffer.size - numChars)
+        fun readMessage(reader: JsonReader): DatabaseMessage? {
+            var toId = ""
+            var toName = ""
+            var fromId = ""
+            var fromName = ""
+            var timestamp = 0L
+            var areFriends = false
+
+            reader.beginObject()
+            try {
+                while (reader.hasNext()) {
+                    val name = reader.nextName()
+                    if (name == "to") {
+                        val toUser = readUser(reader)
+                        if (toUser == null) {
+                            reader.skipValue()
+                        } else {
+                            toId = toUser.id
+                            toName = toUser.name
+                        }
+                    } else if (name == "from") {
+                        val fromUser = readUser(reader)
+                        if (fromUser == null) {
+                            reader.skipValue()
+                        } else {
+                            fromId = fromUser.id
+                            fromName = fromUser.name
+                        }
+                    } else if (name == "timestamp") {
+                        timestamp = reader.nextLong()
+                    } else if (name == "areFriends") {
+                        areFriends = reader.nextBoolean()
+                    } else {
+                        reader.skipValue()
+                    }
+                }
+            } catch (e: IOException) {
+                reader.endObject()
+                return null
+            } finally {
+                reader.endObject()
+                return DatabaseMessage(toId, toName, fromId, fromName, timestamp, areFriends)
             }
-            if (numChars != -1) {
-                // The stream was not empty.
-                // Create String that is actual length of response body if actual length was less than
-                // max length.
-                numChars = Math.min(numChars, maxLength)
-                result = String(buffer, 0, numChars)
-            }
-            return result
         }
+
+        @Throws(IOException::class)
+        fun readUser(reader: JsonReader): User? {
+            var userName = ""
+            var userId = ""
+
+            reader.beginObject()
+            while (reader.hasNext()) {
+                val name = reader.nextName()
+                if (name == "name") {
+                    userName = reader.nextString()
+                } else if (name == "id") {
+                    userId = reader.nextString()
+                } else {
+                    reader.skipValue()
+                }
+            }
+            reader.endObject()
+            return User(userId, userName)
+        }
+
+        //        @Throws(IOException::class)
+//        private fun readStream(stream: InputStream, maxLength: Int): String? {
+//            var result: String? = null
+//            // Read InputStream using the UTF-8 charset.
+//            val reader = InputStreamReader(stream, "UTF-8")
+//            // Create temporary buffer to hold Stream data with specified max length.
+//            val buffer = CharArray(maxLength)
+//            // Populate temporary buffer with Stream data.
+//            var numChars = 0
+//            var readSize = 0
+//            while (numChars < maxLength && readSize != -1) {
+//                numChars += readSize
+//                val pct = 100 * numChars / maxLength
+//                publishProgress(DownloadCallback.Progress.PROCESS_INPUT_STREAM_IN_PROGRESS, pct)
+//                readSize = reader.read(buffer, numChars, buffer.size - numChars)
+//            }
+//            if (numChars != -1) {
+//                // The stream was not empty.
+//                // Create String that is actual length of response body if actual length was less than
+//                // max length.
+//                numChars = Math.min(numChars, maxLength)
+//                result = String(buffer, 0, numChars)
+//            }
+//            return result
+//        }
+
     }
 }
+
 

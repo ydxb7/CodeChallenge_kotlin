@@ -1,6 +1,7 @@
 package ai.tomorrow.codechallenge_kotlin
 
 import ai.tomorrow.codechallenge_kotlin.datasource.MessageDatasource
+import ai.tomorrow.codechallenge_kotlin.model.DatabaseMessage
 import ai.tomorrow.codechallenge_kotlin.utils.DownloadCallback
 import android.content.Context
 import android.net.ConnectivityManager
@@ -30,8 +31,8 @@ class MainActivity : AppCompatActivity() {
                 return connectivityManager.activeNetworkInfo
             }
 
-            override fun updateFromDownload(result: String?) {
-                textView.text = result
+            override fun updateFromDownload(result: List<DatabaseMessage>?) {
+                textView.text = result.toString()
             }
 
             override fun onProgressUpdate(progressCode: Int?, percentComplete: Int?) {
