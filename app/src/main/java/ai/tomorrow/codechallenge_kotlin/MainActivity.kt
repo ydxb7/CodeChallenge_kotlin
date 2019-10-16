@@ -3,7 +3,9 @@ package ai.tomorrow.codechallenge_kotlin
 import ai.tomorrow.codechallenge_kotlin.databinding.ActivityMainBinding
 import ai.tomorrow.codechallenge_kotlin.viewmodel.MainViewModel
 import android.os.Bundle
+import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
+import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import org.koin.android.viewmodel.ext.android.viewModel
 
@@ -17,48 +19,14 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityMainBinding.inflate(layoutInflater)
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
+        binding.lifecycleOwner = this
 
         viewModel.messages.observe(this, Observer {
-            binding.textView.text = it.toString()
+            Log.d(TAG, "message.size = ${it.size}")
+            Log.d(TAG, "binding.textView = ${binding.mainTv}")
+            binding.mainTv.text = it.toString()
         })
-//        val messageDatasource = MessageDatasource(application)
-
-
-//        messageDatasource.fetchFromNet(200, object : DownloadCallback {
-//            override fun getActiveNetworkInfo(): NetworkInfo {
-//                val connectivityManager =
-//                    getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-//                return connectivityManager.activeNetworkInfo
-//            }
-//
-//            override fun updateFromDownload(result: List<DatabaseMessage>?) {
-//                binding.textView.text = result.toString()
-//            }
-//
-//            override fun onProgressUpdate(progressCode: Int?, percentComplete: Int?) {
-//                when (progressCode) {
-//                    // You can add UI behavior for progress updates here.
-//                    DownloadCallback.Progress.ERROR -> {
-//                    }
-//                    DownloadCallback.Progress.CONNECT_SUCCESS -> {
-//                    }
-//                    DownloadCallback.Progress.GET_INPUT_STREAM_SUCCESS -> {
-//                    }
-//                    DownloadCallback.Progress.PROCESS_INPUT_STREAM_IN_PROGRESS -> binding.textView.setText(
-//                        "$percentComplete%"
-//                    )
-//                    DownloadCallback.Progress.PROCESS_INPUT_STREAM_SUCCESS -> {
-//                    }
-//                }
-//            }
-//
-//            override fun finishDownloading() {
-//                mDownloading = false
-//                messageDatasource.cancelDownload()
-//            }
-//
-//        })
 
 
     }

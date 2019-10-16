@@ -2,6 +2,7 @@ package ai.tomorrow.codechallenge_kotlin
 
 
 import ai.tomorrow.codechallenge_kotlin.datasource.MessageDatasource
+import ai.tomorrow.codechallenge_kotlin.repository.MessageRepository
 import ai.tomorrow.codechallenge_kotlin.viewmodel.MainViewModel
 import org.koin.android.viewmodel.dsl.viewModel
 import org.koin.dsl.module
@@ -13,6 +14,7 @@ val appModule = module {
 //    viewModel { ImportWalletViewModel(get()) }
 //
     single { MessageDatasource(get()) }
+    single { MessageRepository(get()) }
 //    single { TransactionRepository(get()) }
 //
 //    single { Web3jDatasource(get()) }

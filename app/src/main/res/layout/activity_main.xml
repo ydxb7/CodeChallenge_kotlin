@@ -7,13 +7,13 @@
         android:layout_height="match_parent"
         tools:context=".MainActivity">
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/recyclerView"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+        <!--        <androidx.recyclerview.widget.RecyclerView-->
+        <!--            android:id="@+id/recyclerView"-->
+        <!--            android:layout_width="match_parent"-->
+        <!--            android:layout_height="match_parent" />-->
 
         <TextView
-            android:id="@+id/textView"
+            android:id="@+id/mainTv"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
 
