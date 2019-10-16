@@ -21,7 +21,7 @@ data class User(
 data class NetworkMessage(
     val to: To,
     val from: From,
-    val timestamp: Long,
+    val timestamp: String,
     val areFriends: Boolean
 )
 
@@ -33,7 +33,7 @@ data class DatabaseMessage(
     val fromId: String,
     val fromName: String,
     @PrimaryKey
-    val timestamp: Long,
+    val timestamp: String,
     val areFriends: Boolean
 )
 

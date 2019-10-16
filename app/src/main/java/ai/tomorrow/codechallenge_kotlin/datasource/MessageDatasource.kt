@@ -29,10 +29,11 @@ class MessageDatasource(application: Application) {
     fun clearAllMessages() = database.clear()
 
     fun insertAllMessages(vararg m: DatabaseMessage) = database.insertAll(*m)
-    
+
 
     @Throws(IOException::class)
     fun downloadUrl(urlString: String, messageNum: Int): List<DatabaseMessage>? {
+        Log.d(TAG, "downloadUrl")
         val url = URL(urlString)
         var stream: InputStream? = null
         var connection: HttpsURLConnection? = null
@@ -67,7 +68,6 @@ class MessageDatasource(application: Application) {
                             messages.add(message)
                         }
                         Log.d(TAG, "messages.size = ${messages.size}")
-                        Log.d(TAG, "messages = $message")
                     }
                     insertAllMessages(*(messages.toTypedArray()))
                 } catch (e: IOException) {
@@ -90,17 +90,25 @@ class MessageDatasource(application: Application) {
         var toName = ""
         var fromId = ""
         var fromName = ""
-        var timestamp = 0L
+        var timestamp = ""
         var areFriends = false
 
-        reader.beginObject()
+        try {
+            reader.beginObject()
+        } catch (e: IllegalStateException) {
+            Log.e(TAG, "readMessage IllegalStateException: $e")
+            endObject(reader)
+            return null
+        }
+
         try {
             while (reader.hasNext()) {
                 val name = reader.nextName()
                 if (name == "to") {
                     val toUser = readUser(reader)
                     if (toUser == null) {
-                        reader.skipValue()
+                        endObject(reader)
+                        return null
                     } else {
                         toId = toUser.id
                         toName = toUser.name
@@ -108,28 +116,38 @@ class MessageDatasource(application: Application) {
                 } else if (name == "from") {
                     val fromUser = readUser(reader)
                     if (fromUser == null) {
-                        reader.skipValue()
+                        endObject(reader)
+                        return null
                     } else {
                         fromId = fromUser.id
                         fromName = fromUser.name
                     }
                 } else if (name == "timestamp") {
-                    timestamp = reader.nextLong()
+                    timestamp = reader.nextString()
                 } else if (name == "areFriends") {
                     areFriends = reader.nextBoolean()
                 } else {
                     reader.skipValue()
                 }
             }
-        } catch (e: IOException) {
-            reader.endObject()
-            return null
         } catch (e: IllegalStateException) {
-            reader.endObject()
+            Log.e(TAG, "readMessage IllegalStateException: $e")
+            endObject(reader)
             return null
-        } finally {
+        }
+        endObject(reader)
+        return DatabaseMessage(toId, toName, fromId, fromName, timestamp, areFriends)
+    }
+
+
+    private fun endObject(reader: JsonReader) {
+        try {
+            while (reader.hasNext()) {
+                reader.skipValue()
+            }
             reader.endObject()
-            return DatabaseMessage(toId, toName, fromId, fromName, timestamp, areFriends)
+        } catch (e: IllegalStateException) {
+            Log.e(TAG, "endObject IllegalStateException: $e")
         }
     }
 
@@ -138,18 +156,30 @@ class MessageDatasource(application: Application) {
         var userName = ""
         var userId = ""
 
-        reader.beginObject()
-        while (reader.hasNext()) {
-            val name = reader.nextName()
-            if (name == "name") {
-                userName = reader.nextString()
-            } else if (name == "id") {
-                userId = reader.nextString()
-            } else {
-                reader.skipValue()
-            }
+        try {
+            reader.beginObject()
+        } catch (e: IllegalStateException) {
+            Log.e(TAG, "IllegalStateException: $e")
+            endObject(reader)
+            return null
         }
-        reader.endObject()
+        try {
+            while (reader.hasNext()) {
+                val name = reader.nextName()
+                if (name == "name") {
+                    userName = reader.nextString()
+                } else if (name == "id") {
+                    userId = reader.nextString()
+                } else {
+                    reader.skipValue()
+                }
+            }
+        } catch (e: IllegalStateException) {
+            Log.d(TAG, "readUser IllegalStateException: $e")
+            endObject(reader)
+            return null
+        }
+        endObject(reader)
         return User(userId, userName)
     }
 }

@@ -5,7 +5,7 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 
-@Database(entities = [DatabaseMessage::class], version = 1)
+@Database(entities = [DatabaseMessage::class], version = 4)
 abstract class MessageDatabase : RoomDatabase() {
     abstract val messageDao: MessageDao
 }
