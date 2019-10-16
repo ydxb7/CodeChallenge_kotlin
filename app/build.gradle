@@ -61,4 +61,7 @@ dependencies {
     implementation "androidx.room:room-runtime:2.1.0"
     implementation "androidx.room:room-ktx:2.1.0"
 
+    // koin
+    implementation "org.koin:koin-android-viewmodel:2.0.1"
+    implementation 'org.koin:koin-android:2.0.1'
 }

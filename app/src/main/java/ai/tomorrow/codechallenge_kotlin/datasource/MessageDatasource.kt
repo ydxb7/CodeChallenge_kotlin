@@ -2,6 +2,7 @@ package ai.tomorrow.codechallenge_kotlin.datasource
 
 import ai.tomorrow.codechallenge_kotlin.model.DatabaseMessage
 import ai.tomorrow.codechallenge_kotlin.model.User
+import ai.tomorrow.codechallenge_kotlin.model.getDatabase
 import ai.tomorrow.codechallenge_kotlin.utils.DownloadCallback
 import android.app.Application
 import android.net.ConnectivityManager
@@ -16,18 +17,26 @@ import javax.net.ssl.HttpsURLConnection
 
 
 const val CODE_CHALLENGE_URL = "https://codechallenge.secrethouse.party/"
-const val MASSAGE_NUM = 200
+//const val MASSAGE_NUM = 200
 //const val CODE_CHALLENGE_URL = "https://www.google.com"
 
 class MessageDatasource(application: Application) {
 
     private val TAG = "MessageDatasource"
 
+    val database = getDatabase(application).messageDao
+
+    val messages = database.getAllMessages()
+
+    fun clearAllMessages() = database.clear()
+
+    fun insertAllMessages(vararg m: DatabaseMessage) = database.insertAll(*m)
+
     private var mDownloadTask: DownloadTask? = null
 
-    fun fetchFromNet(callback: DownloadCallback) {
+    fun fetchFromNet(massageNum: Int, callback: DownloadCallback) {
         cancelDownload()
-        mDownloadTask = DownloadTask(callback)
+        mDownloadTask = DownloadTask(massageNum, callback)
         (mDownloadTask as DownloadTask).execute(CODE_CHALLENGE_URL)
     }
 
@@ -38,7 +47,7 @@ class MessageDatasource(application: Application) {
         }
     }
 
-    private inner class DownloadTask(val mCallback: DownloadCallback) :
+    private inner class DownloadTask(val massageNum: Int, val mCallback: DownloadCallback) :
         AsyncTask<String, Int, List<DatabaseMessage>>() {
 
 
@@ -91,7 +100,6 @@ class MessageDatasource(application: Application) {
             var connection: HttpsURLConnection? = null
             val messages = ArrayList<DatabaseMessage>()
             var num = 0
-//            var result: String? = null
             try {
                 connection = url.openConnection() as HttpsURLConnection
                 // Timeout for reading InputStream arbitrarily set to 3000ms.
@@ -117,8 +125,7 @@ class MessageDatasource(application: Application) {
                     val reader = JsonReader(InputStreamReader(stream, "UTF-8"))
                     reader.isLenient = true
                     try {
-//                        reader.beginObject()
-                        while (reader.hasNext() && num++ < MASSAGE_NUM) {
+                        while (reader.hasNext() && num++ < massageNum) {
                             val message = readMessage(reader)
                             if (message != null) {
                                 messages.add(message)
@@ -126,15 +133,12 @@ class MessageDatasource(application: Application) {
                             Log.d(TAG, "messages.size = ${messages.size}")
                             Log.d(TAG, "messages = $message")
                         }
-//                        reader.endObject()
                     } catch (e: IOException) {
                         Log.e(TAG, "Problem reading messages objects")
                     } finally {
                         reader.close()
                     }
 
-
-//                    result = readStream(stream, 500)
                     publishProgress(DownloadCallback.Progress.PROCESS_INPUT_STREAM_SUCCESS, 0)
                 }
             } finally {
@@ -210,33 +214,6 @@ class MessageDatasource(application: Application) {
             reader.endObject()
             return User(userId, userName)
         }
-
-        //        @Throws(IOException::class)
-//        private fun readStream(stream: InputStream, maxLength: Int): String? {
-//            var result: String? = null
-//            // Read InputStream using the UTF-8 charset.
-//            val reader = InputStreamReader(stream, "UTF-8")
-//            // Create temporary buffer to hold Stream data with specified max length.
-//            val buffer = CharArray(maxLength)
-//            // Populate temporary buffer with Stream data.
-//            var numChars = 0
-//            var readSize = 0
-//            while (numChars < maxLength && readSize != -1) {
-//                numChars += readSize
-//                val pct = 100 * numChars / maxLength
-//                publishProgress(DownloadCallback.Progress.PROCESS_INPUT_STREAM_IN_PROGRESS, pct)
-//                readSize = reader.read(buffer, numChars, buffer.size - numChars)
-//            }
-//            if (numChars != -1) {
-//                // The stream was not empty.
-//                // Create String that is actual length of response body if actual length was less than
-//                // max length.
-//                numChars = Math.min(numChars, maxLength)
-//                result = String(buffer, 0, numChars)
-//            }
-//            return result
-//        }
-
     }
 }
 
