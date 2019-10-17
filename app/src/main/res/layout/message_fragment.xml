@@ -8,8 +8,49 @@
         android:layout_height="match_parent"
         tools:context=".MainActivity">
 
+
+        <!--            Toolbar            -->
+        <com.google.android.material.appbar.AppBarLayout
+            android:id="@+id/app_bar_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <androidx.appcompat.widget.Toolbar
+                android:id="@+id/defaultWalletToolBar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Messages"
+                        android:textColor="@color/white"
+                        android:layout_centerInParent="true"
+                        android:textSize="20dp" />
+
+                    <ImageView
+                        android:id="@+id/settingIv"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:tint="@color/white"
+                        android:src="@drawable/settings_ic"
+                        android:layout_alignParentEnd="true"
+                        android:padding="5dp"
+                        android:layout_marginEnd="16dp" />
+
+                </RelativeLayout>
+
+            </androidx.appcompat.widget.Toolbar>
+
+        </com.google.android.material.appbar.AppBarLayout>
+
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recyclerView"
+            android:layout_below="@id/app_bar_layout"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />

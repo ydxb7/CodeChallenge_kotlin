@@ -10,6 +10,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
+import androidx.navigation.findNavController
 import org.koin.android.viewmodel.ext.android.viewModel
 
 class MessageFragment : Fragment() {
@@ -33,6 +34,12 @@ class MessageFragment : Fragment() {
         binding.recyclerView.adapter = adapter
 
 
+        binding.settingIv.setOnClickListener {
+            val direction = MessageFragmentDirections.actionMessageFragmentToSettingDialogFragment()
+            it.findNavController().navigate(direction)
+        }
+
+
         viewModel.messages.observe(this, Observer {
             Log.d(TAG, "message.size = ${it.size}")
 //            Log.d(TAG, "binding.textView = ${binding.mainTv}")
@@ -43,6 +50,4 @@ class MessageFragment : Fragment() {
 
         return binding.root
     }
-
-
 }
