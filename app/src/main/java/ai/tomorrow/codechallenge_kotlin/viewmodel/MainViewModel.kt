@@ -22,7 +22,7 @@ class MainViewModel(
     init {
         uiScope.launch {
             withContext(Dispatchers.IO) {
-                messageRepository.reset(CODE_CHALLENGE_URL, 6000)
+                messageRepository.reset(CODE_CHALLENGE_URL, 200)
             }
         }
 
