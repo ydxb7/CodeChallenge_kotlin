@@ -22,6 +22,10 @@ class MessageDatasource(application: Application) {
 
     val messages = database.getAllMessages()
 
+    val friendMessages = database.getFriends()
+
+    val noFriendMessages = database.getNoFriends()
+
     fun clearAllMessages() = database.clear()
 
     fun insertAllMessages(vararg m: DatabaseMessage) = database.insertAll(*m)

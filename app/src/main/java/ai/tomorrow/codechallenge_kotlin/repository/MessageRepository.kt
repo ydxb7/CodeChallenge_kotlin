@@ -2,6 +2,7 @@ package ai.tomorrow.codechallenge_kotlin.repository
 
 import ai.tomorrow.codechallenge_kotlin.datasource.MessageDatasource
 import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 
 class MessageRepository(val messageDatasource: MessageDatasource) {
 
@@ -9,11 +10,19 @@ class MessageRepository(val messageDatasource: MessageDatasource) {
 
     val messages = messageDatasource.messages
 
-    suspend fun reset(urlString: String, totoalNum: Int) {
-        messageDatasource.clearAllMessages()
-        val newMessages = messageDatasource.downloadToDatabase(urlString, totoalNum)
+    val friendMessages = messageDatasource.friendMessages
 
+    val noFriendMessages = messageDatasource.noFriendMessages
+
+    suspend fun reset(urlString: String, totoalNum: Int) {
+        mutex.withLock {
+            messageDatasource.clearAllMessages()
+            messageDatasource.downloadToDatabase(urlString, totoalNum)
+        }
     }
 
+    suspend fun fetchNew(urlString: String, totoalNum: Int) {
+        messageDatasource.downloadToDatabase(urlString, totoalNum)
+    }
 
 }
