@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <ListPreference
+        android:defaultValue="@string/pref_all_value"
+        android:entries="@array/pref_friend_labels"
+        android:entryValues="@array/pref_friend_values"
+        android:key="@string/pref_friend_key"
+        android:title="@string/pref_friend_label" />
+
+</PreferenceScreen>

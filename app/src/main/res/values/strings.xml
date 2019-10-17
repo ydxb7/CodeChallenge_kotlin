@@ -1,3 +1,15 @@
 <resources>
     <string name="app_name">CodeChallenge_kotlin</string>
+
+    <string name="pref_friend_key" translatable="false">friend</string>
+    <string name="pref_friend_label">Show Messages From</string>
+
+    <string name="pref_label_all">All</string>
+    <string name="pref_label_friends">Friends</string>
+    <string name="pref_label_no_friends">No Fiends</string>
+
+    <string name="pref_all_value" translatable="false">all</string>
+    <string name="pref_friends_value" translatable="false">friends</string>
+    <string name="pref_no_friends_value" translatable="false">no_friends</string>
+
 </resources>
