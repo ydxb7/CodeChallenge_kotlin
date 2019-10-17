@@ -31,7 +31,7 @@ class MessageFragment : Fragment() {
         setupWidgets()
 
         setupLiveData()
-        
+
         return binding.root
     }
 
@@ -65,7 +65,14 @@ class MessageFragment : Fragment() {
         }
     }
 
-    private val observer = Observer<List<DatabaseMessage>> { adapter.insertNewData(it) }
+    private val observer = Observer<List<DatabaseMessage>> {
+        if (it.isNullOrEmpty()) {
+            binding.emptyTv.visibility = View.VISIBLE
+        } else {
+            binding.emptyTv.visibility = View.GONE
+        }
+        adapter.insertNewData(it)
+    }
 
     private fun showAllMessages() {
         viewModel.messagesFriend.removeObserver(observer)

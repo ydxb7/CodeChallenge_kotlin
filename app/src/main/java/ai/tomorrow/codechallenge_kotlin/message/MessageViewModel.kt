@@ -3,8 +3,11 @@ package ai.tomorrow.codechallenge_kotlin.message
 import ai.tomorrow.codechallenge_kotlin.R
 import ai.tomorrow.codechallenge_kotlin.repository.MessageRepository
 import android.app.Application
+import android.content.Context
 import android.content.SharedPreferences
+import android.net.ConnectivityManager
 import android.util.Log
+import android.widget.Toast
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -62,19 +65,37 @@ class MessageViewModel(
     }
 
     fun resetMessages() {
-        uiScope.launch {
-            withContext(Dispatchers.IO) {
-                messageRepository.reset(CODE_CHALLENGE_URL, MESSAGE_TOTAL_NUM)
+        if (isNetValid()) {
+            uiScope.launch {
+                withContext(Dispatchers.IO) {
+                    messageRepository.reset(CODE_CHALLENGE_URL, MESSAGE_TOTAL_NUM)
+                }
             }
         }
     }
 
     fun loadMoreMessages() {
-        uiScope.launch {
-            withContext(Dispatchers.IO) {
-                messageRepository.fetchMore(CODE_CHALLENGE_URL, MESSAGE_TOTAL_NUM)
+        if (isNetValid()) {
+            uiScope.launch {
+                withContext(Dispatchers.IO) {
+                    messageRepository.fetchMore(CODE_CHALLENGE_URL, MESSAGE_TOTAL_NUM)
+                }
             }
         }
+    }
+
+    private fun isNetValid(): Boolean {
+        val connectivityManager =
+            application.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val networkInfo = connectivityManager.activeNetworkInfo
+        val isNetValid = !(networkInfo == null || !networkInfo.isConnected ||
+            networkInfo.type != ConnectivityManager.TYPE_WIFI &&
+            networkInfo.type != ConnectivityManager.TYPE_MOBILE)
+
+        if (!isNetValid) {
+            Toast.makeText(application, "No network", Toast.LENGTH_SHORT).show()
+        }
+        return isNetValid
     }
 
     override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {

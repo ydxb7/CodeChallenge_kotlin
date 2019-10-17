@@ -56,5 +56,15 @@
             android:padding="10dp"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
 
+        <TextView
+            android:id="@+id/emptyTv"
+            style="@style/fontStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:text="Empty"
+            android:textColor="@color/white"
+            android:textSize="24sp" />
+
     </RelativeLayout>
 </layout>
