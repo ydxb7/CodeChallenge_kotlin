@@ -28,6 +28,24 @@ class MessageFragment : Fragment() {
 
         binding.lifecycleOwner = this
 
+        setupWidgets()
+
+        setupLiveData()
+        
+        return binding.root
+    }
+
+    private fun setupLiveData() {
+        viewModel.messageType.observe(this, Observer {
+            when (it) {
+                MessageType.ALL -> showAllMessages()
+                MessageType.FRIEND -> showFriendMessages()
+                MessageType.NOTFRIEND -> showNotFriendMessages()
+            }
+        })
+    }
+
+    private fun setupWidgets() {
         adapter = MessageRecyclerViewAdapter(
             ArrayList(),
             object : MessageRecyclerViewAdapter.OnLoadMoreItemsListener {
@@ -45,17 +63,6 @@ class MessageFragment : Fragment() {
                 SettingDialogFragment::class.simpleName
             )
         }
-
-        viewModel.messageType.observe(this, Observer {
-            when (it) {
-                MessageType.ALL -> showAllMessages()
-                MessageType.FRIEND -> showFriendMessages()
-                MessageType.NOTFRIEND -> showNotFriendMessages()
-            }
-        })
-
-
-        return binding.root
     }
 
     private val observer = Observer<List<DatabaseMessage>> { adapter.insertNewData(it) }

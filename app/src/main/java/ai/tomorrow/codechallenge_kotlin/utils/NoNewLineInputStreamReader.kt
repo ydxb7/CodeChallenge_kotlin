@@ -10,15 +10,15 @@ import java.nio.charset.CharsetDecoder
 class NoNewLineInputStreamReader : InputStreamReader {
 
 
-    constructor(`in`: InputStream) : super(`in`) {}
+    constructor(inStream: InputStream) : super(inStream) {}
 
     @Throws(UnsupportedEncodingException::class)
-    constructor(`in`: InputStream, charsetName: String) : super(`in`, charsetName) {
+    constructor(inStream: InputStream, charsetName: String) : super(inStream, charsetName) {
     }
 
-    constructor(`in`: InputStream, cs: Charset) : super(`in`, cs) {}
+    constructor(inStream: InputStream, cs: Charset) : super(inStream, cs) {}
 
-    constructor(`in`: InputStream, dec: CharsetDecoder) : super(`in`, dec) {}
+    constructor(inStream: InputStream, dec: CharsetDecoder) : super(inStream, dec) {}
 
     @Throws(IOException::class)
     override fun read(cbuf: CharArray, offset: Int, length: Int): Int {

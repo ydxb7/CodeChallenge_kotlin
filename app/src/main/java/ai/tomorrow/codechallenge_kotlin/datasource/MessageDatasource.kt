@@ -51,7 +51,6 @@ class MessageDatasource(val application: Application) {
         }
     }
 
-
     suspend fun downloadToDatabase(urlString: String, messageNum: Int) {
         mutex.withLock {
             Log.d(TAG, "downloadUrl")
@@ -105,7 +104,6 @@ class MessageDatasource(val application: Application) {
                 connection?.disconnect()
             }
         }
-
     }
 
     private fun readMessage(reader: JsonReader): DatabaseMessage? {
