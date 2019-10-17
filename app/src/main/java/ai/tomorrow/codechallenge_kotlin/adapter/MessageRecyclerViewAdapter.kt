@@ -2,6 +2,7 @@ package ai.tomorrow.codechallenge_kotlin.adapter
 
 import ai.tomorrow.codechallenge_kotlin.databinding.ListItemBinding
 import ai.tomorrow.codechallenge_kotlin.model.DatabaseMessage
+import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
@@ -64,8 +65,12 @@ class MessageRecyclerViewAdapter(
             binding.timeTv.text = timeString
             if (message.areFriends) {
                 binding.friendTv.text = "friends"
+                binding.friendTv.setTextColor(Color.GREEN)
+                binding.colorBar.setBackgroundColor(Color.GREEN)
             } else {
                 binding.friendTv.text = "not friends"
+                binding.friendTv.setTextColor(Color.RED)
+                binding.colorBar.setBackgroundColor(Color.RED)
             }
         }
     }

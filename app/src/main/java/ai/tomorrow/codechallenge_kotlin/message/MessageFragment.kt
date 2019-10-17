@@ -32,7 +32,7 @@ class MessageFragment : Fragment() {
             ArrayList(),
             object : MessageRecyclerViewAdapter.OnLoadMoreItemsListener {
                 override fun onLoadMoreItems() {
-                    viewModel.moreMessages()
+                    viewModel.loadMoreMessages()
                 }
             })
         binding.recyclerView.adapter = adapter

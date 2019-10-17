@@ -14,7 +14,7 @@ import org.koin.core.KoinComponent
 import org.koin.core.inject
 
 const val CODE_CHALLENGE_URL = "https://codechallenge.secrethouse.party/"
-const val MESSAGE_TOTAL_NUM = 200
+const val MESSAGE_TOTAL_NUM = 2000
 
 enum class MessageType {
     ALL, FRIEND, NOTFRIEND
@@ -69,7 +69,7 @@ class MessageViewModel(
         }
     }
 
-    fun moreMessages() {
+    fun loadMoreMessages() {
         uiScope.launch {
             withContext(Dispatchers.IO) {
                 messageRepository.fetchMore(CODE_CHALLENGE_URL, MESSAGE_TOTAL_NUM)

@@ -8,13 +8,15 @@
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:padding="20dp">
 
         <TextView
             android:id="@+id/text1"
-            android:text="Show for:"
+            android:text="Show For"
             android:textColor="@color/black"
             android:textSize="24sp"
+            android:layout_centerHorizontal="true"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
 
@@ -23,24 +25,31 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
+            android:layout_marginTop="10dp"
             android:layout_below="@id/text1">
 
             <RadioButton
                 android:id="@+id/allRadio"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:paddingStart="10dp"
+                android:textSize="20sp"
                 android:text="All" />
 
             <RadioButton
                 android:id="@+id/friendRadio"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:paddingStart="10dp"
+                android:textSize="20sp"
                 android:text="Friends" />
 
             <RadioButton
                 android:id="@+id/noFriendRadio"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:paddingStart="10dp"
+                android:textSize="20sp"
                 android:text="No Friends" />
         </RadioGroup>
     </RelativeLayout>

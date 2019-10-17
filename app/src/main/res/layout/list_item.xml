@@ -11,89 +11,106 @@
 
     </data>
 
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center_vertical"
-        android:orientation="horizontal"
-        android:padding="16dp">
+        android:layout_height="70dp"
+        android:background="@color/darkGrey2">
 
         <TextView
             android:id="@+id/listIndexTv"
-            android:layout_width="0dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:layout_weight="1"
-            android:textSize="12dp"
-            tools:text="15" />
+            android:layout_centerVertical="true"
+            android:textSize="12sp"
+            android:textColor="@color/white"
+            tools:text="15"
+            style="@style/fontStyle" />
 
-        <LinearLayout
-            android:layout_width="0dp"
+        <TextView
+            android:id="@+id/text1"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="2"
-            android:orientation="vertical"
-            android:paddingLeft="16dp">
+            android:text="From"
+            style="@style/fontStyle"
+            android:textColor="@color/white"
+            android:textSize="16sp"
+            android:layout_marginTop="10dp"
+            android:layout_marginStart="35dp" />
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="top"
-                android:text="To: " />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="From: " />
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="0dp"
+        <TextView
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="6"
-            android:orientation="vertical"
-            android:paddingLeft="16dp">
+            android:text="To"
+            android:layout_below="@id/text1"
+            style="@style/fontStyle"
+            android:textColor="@color/white"
+            android:textSize="16sp"
+            android:layout_marginTop="4dp"
+            android:layout_marginStart="35dp" />
 
-            <TextView
-                android:id="@+id/toNameTv"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@{message.toName}"
-                tools:text="Nicholas Anderson" />
-
-            <TextView
-                android:id="@+id/fromNameTv"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@{message.fromName}"
-                tools:text="Louis Scott" />
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="0dp"
+        <TextView
+            android:id="@+id/toNameTv"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="end"
-            android:layout_weight="5"
-            android:orientation="vertical"
-            android:paddingLeft="16dp">
+            android:text="@{message.toName}"
+            style="@style/fontStyle"
+            android:textColor="@color/yellow"
+            android:textSize="16sp"
+            android:layout_marginTop="10dp"
+            android:layout_marginStart="90dp"
+            tools:text="Nicholas Anderson" />
 
-            <TextView
-                android:id="@+id/timeTv"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="end"
-                android:textSize="10dp"
-                tools:text="Friday" />
+        <TextView
+            android:id="@+id/fromNameTv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@{message.fromName}"
+            style="@style/fontStyle"
+            android:textColor="@color/yellow"
+            android:textSize="16sp"
+            android:layout_marginTop="4dp"
+            android:layout_below="@id/toNameTv"
+            android:layout_marginStart="90dp"
+            tools:text="Louis Scott" />
 
-            <TextView
-                android:id="@+id/friendTv"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="end"
-                tools:text="true" />
+        <TextView
+            android:id="@+id/timeTv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="14dp"
+            android:textColor="@color/lightGrey"
+            android:layout_toStartOf="@id/colorBar"
+            android:layout_marginTop="12dp"
+            android:layout_marginEnd="20dp"
+            style="@style/fontStyle"
+            tools:text="Friday" />
 
-        </LinearLayout>
+        <TextView
+            android:id="@+id/friendTv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/green"
+            android:textSize="14dp"
+            android:layout_marginTop="6dp"
+            android:layout_toStartOf="@id/colorBar"
+            android:layout_marginEnd="20dp"
+            android:layout_below="@id/timeTv"
+            style="@style/fontStyle"
+            tools:text="true" />
 
-    </LinearLayout>
+        <View
+            android:id="@+id/colorBar"
+            android:layout_width="6dp"
+            android:layout_height="50dp"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:background="@color/green" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="4dp"
+            android:layout_alignParentBottom="true"
+            android:background="@color/darkGrey1" />
+
+    </RelativeLayout>
 </layout>
