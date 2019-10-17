@@ -3,24 +3,18 @@ package ai.tomorrow.codechallenge_kotlin.datasource
 import ai.tomorrow.codechallenge_kotlin.model.DatabaseMessage
 import ai.tomorrow.codechallenge_kotlin.model.User
 import ai.tomorrow.codechallenge_kotlin.model.getDatabase
+import ai.tomorrow.codechallenge_kotlin.utils.NoNewLineInputStreamReader
 import android.app.Application
 import android.util.JsonReader
 import android.util.Log
-import kotlinx.coroutines.sync.Mutex
 import java.io.IOException
 import java.io.InputStream
-import java.io.InputStreamReader
 import java.net.URL
 import javax.net.ssl.HttpsURLConnection
-
-
-//const val MASSAGE_NUM = 200
-//const val CODE_CHALLENGE_URL = "https://www.google.com"
 
 class MessageDatasource(application: Application) {
 
     private val TAG = "MessageDatasource"
-    private val mutex = Mutex()
 
     val database = getDatabase(application).messageDao
 
@@ -31,14 +25,12 @@ class MessageDatasource(application: Application) {
     fun insertAllMessages(vararg m: DatabaseMessage) = database.insertAll(*m)
 
 
-    @Throws(IOException::class)
     fun downloadUrl(urlString: String, messageNum: Int): List<DatabaseMessage>? {
         Log.d(TAG, "downloadUrl")
         val url = URL(urlString)
         var stream: InputStream? = null
         var connection: HttpsURLConnection? = null
         val messages = ArrayList<DatabaseMessage>()
-        var num = 0
         try {
             connection = url.openConnection() as HttpsURLConnection
             // Timeout for reading InputStream arbitrarily set to 3000ms.
@@ -59,22 +51,20 @@ class MessageDatasource(application: Application) {
             // Retrieve the response body as an InputStream.
             stream = connection.inputStream
             if (stream != null) {
-                val reader = JsonReader(InputStreamReader(stream, "UTF-8"))
+
+                val noNewLineInputStreamReader = NoNewLineInputStreamReader(stream, "UTF-8")
+                val reader = JsonReader(noNewLineInputStreamReader)
+//                val reader = JsonReader(InputStreamReader(stream, "UTF-8"))
                 reader.isLenient = true
-                try {
-                    while (reader.hasNext() && num++ < messageNum) {
-                        val message = readMessage(reader)
-                        if (message != null) {
-                            messages.add(message)
-                        }
-                        Log.d(TAG, "messages.size = ${messages.size}")
+
+                while (reader.hasNext() && messages.size < messageNum) {
+                    val message = readMessage(reader)
+                    if (message != null) {
+                        messages.add(message)
                     }
-                    insertAllMessages(*(messages.toTypedArray()))
-                } catch (e: IOException) {
-                    Log.e(TAG, "Problem reading messages objects")
-                } finally {
-                    reader.close()
+                    Log.d(TAG, "messages.size = ${messages.size}")
                 }
+                reader.close()
             }
         } finally {
             // Close Stream and disconnect HTTPS connection.
@@ -84,8 +74,7 @@ class MessageDatasource(application: Application) {
         return messages
     }
 
-    @Throws(IOException::class)
-    fun readMessage(reader: JsonReader): DatabaseMessage? {
+    private fun readMessage(reader: JsonReader): DatabaseMessage? {
         var toId = ""
         var toName = ""
         var fromId = ""
@@ -93,14 +82,7 @@ class MessageDatasource(application: Application) {
         var timestamp = ""
         var areFriends = false
 
-        try {
-            reader.beginObject()
-        } catch (e: IllegalStateException) {
-            Log.e(TAG, "readMessage IllegalStateException: $e")
-            endObject(reader)
-            return null
-        }
-
+        reader.beginObject()
         try {
             while (reader.hasNext()) {
                 val name = reader.nextName()
@@ -139,30 +121,23 @@ class MessageDatasource(application: Application) {
         return DatabaseMessage(toId, toName, fromId, fromName, timestamp, areFriends)
     }
 
-
     private fun endObject(reader: JsonReader) {
         try {
             while (reader.hasNext()) {
                 reader.skipValue()
             }
             reader.endObject()
-        } catch (e: IllegalStateException) {
-            Log.e(TAG, "endObject IllegalStateException: $e")
+        } catch (e: Exception) {
+            Log.e(TAG, "endObject Exception: $e")
+            return
         }
     }
 
-    @Throws(IOException::class)
     fun readUser(reader: JsonReader): User? {
         var userName = ""
         var userId = ""
 
-        try {
-            reader.beginObject()
-        } catch (e: IllegalStateException) {
-            Log.e(TAG, "IllegalStateException: $e")
-            endObject(reader)
-            return null
-        }
+        reader.beginObject()
         try {
             while (reader.hasNext()) {
                 val name = reader.nextName()
