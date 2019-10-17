@@ -46,6 +46,5 @@ class MessageRecyclerViewAdapter(private var mData: List<DatabaseMessage>) :
                 binding.friendTv.text = "not friends"
             }
         }
-
     }
 }

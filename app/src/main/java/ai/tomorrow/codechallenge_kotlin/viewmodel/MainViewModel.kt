@@ -20,14 +20,19 @@ class MainViewModel(
     val messages = messageRepository.messages
 
     init {
+        resetMessages()
+
+
+    }
+
+    fun resetMessages() {
         uiScope.launch {
             withContext(Dispatchers.IO) {
                 messageRepository.reset(CODE_CHALLENGE_URL, 200)
             }
         }
-
-
     }
+
 
     override fun onCleared() {
         super.onCleared()
