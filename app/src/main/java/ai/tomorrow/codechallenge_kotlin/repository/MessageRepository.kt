@@ -14,6 +14,11 @@ class MessageRepository(val messageDatasource: MessageDatasource) {
 
     val noFriendMessages = messageDatasource.noFriendMessages
 
+    fun getRelationFromPreference() = messageDatasource.getRelationFromPreference()
+
+    fun saveRelationInPreference(valueResource: Int) =
+        messageDatasource.saveRelationInPreference(valueResource)
+
     suspend fun reset(urlString: String, totoalNum: Int) {
         mutex.withLock {
             messageDatasource.clearAllMessages()

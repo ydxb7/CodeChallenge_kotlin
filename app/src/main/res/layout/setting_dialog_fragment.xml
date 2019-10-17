@@ -1,7 +1,47 @@
-<?xml version="1.0" encoding="utf-8"?>
-<fragment android:id="@+id/setting_fragment"
-    android:name="ai.tomorrow.codechallenge_kotlin.SettingDialogFragment"
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent" />
+<?xml version="1.0" encoding="utf-8"?><!--<fragment android:id="@+id/setting_fragment"-->
+<!--    android:name="ai.tomorrow.codechallenge_kotlin.SettingDialogFragment"-->
+<!--    xmlns:android="http://schemas.android.com/apk/res/android"-->
+<!--    android:layout_width="match_parent"-->
+<!--    android:layout_height="match_parent" />-->
 
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <TextView
+            android:id="@+id/text1"
+            android:text="Show for:"
+            android:textColor="@color/black"
+            android:textSize="24sp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <RadioGroup
+            android:id="@+id/radioGroup"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_below="@id/text1">
+
+            <RadioButton
+                android:id="@+id/allRadio"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="All" />
+
+            <RadioButton
+                android:id="@+id/friendRadio"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Friends" />
+
+            <RadioButton
+                android:id="@+id/noFriendRadio"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="No Friends" />
+        </RadioGroup>
+    </RelativeLayout>
+</layout>

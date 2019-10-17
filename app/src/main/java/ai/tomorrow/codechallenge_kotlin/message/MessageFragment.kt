@@ -1,5 +1,6 @@
 package ai.tomorrow.codechallenge_kotlin.message
 
+import ai.tomorrow.codechallenge_kotlin.SettingDialogFragment
 import ai.tomorrow.codechallenge_kotlin.adapter.MessageRecyclerViewAdapter
 import ai.tomorrow.codechallenge_kotlin.databinding.MessageFragmentBinding
 import ai.tomorrow.codechallenge_kotlin.viewmodel.MainViewModel
@@ -10,7 +11,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
-import androidx.navigation.findNavController
 import org.koin.android.viewmodel.ext.android.viewModel
 
 class MessageFragment : Fragment() {
@@ -35,8 +35,11 @@ class MessageFragment : Fragment() {
 
 
         binding.settingIv.setOnClickListener {
-            val direction = MessageFragmentDirections.actionMessageFragmentToSettingDialogFragment()
-            it.findNavController().navigate(direction)
+            val settingDialogFragment = SettingDialogFragment()
+            settingDialogFragment.show(
+                requireNotNull(fragmentManager),
+                SettingDialogFragment::class.simpleName
+            )
         }
 
 

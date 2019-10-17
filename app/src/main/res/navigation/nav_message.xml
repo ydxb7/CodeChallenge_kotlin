@@ -7,13 +7,5 @@
     <fragment
         android:id="@+id/messageFragment"
         android:name="ai.tomorrow.codechallenge_kotlin.message.MessageFragment"
-        android:label="MessageFragment">
-        <action
-            android:id="@+id/action_messageFragment_to_settingDialogFragment"
-            app:destination="@id/settingDialogFragment" />
-    </fragment>
-    <fragment
-        android:id="@+id/settingDialogFragment"
-        android:name="ai.tomorrow.codechallenge_kotlin.SettingDialogFragment"
-        android:label="SettingDialogFragment" />
+        android:label="MessageFragment" />
 </navigation>

@@ -1,5 +1,6 @@
 package ai.tomorrow.codechallenge_kotlin.datasource
 
+import ai.tomorrow.codechallenge_kotlin.R
 import ai.tomorrow.codechallenge_kotlin.model.DatabaseMessage
 import ai.tomorrow.codechallenge_kotlin.model.User
 import ai.tomorrow.codechallenge_kotlin.model.getDatabase
@@ -7,6 +8,8 @@ import ai.tomorrow.codechallenge_kotlin.utils.NoNewLineInputStreamReader
 import android.app.Application
 import android.util.JsonReader
 import android.util.Log
+import androidx.core.content.edit
+import androidx.preference.PreferenceManager
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import java.io.IOException
@@ -14,10 +17,12 @@ import java.io.InputStream
 import java.net.URL
 import javax.net.ssl.HttpsURLConnection
 
-class MessageDatasource(application: Application) {
+class MessageDatasource(val application: Application) {
 
     private val TAG = "MessageDatasource"
     private val mutex = Mutex()
+
+    val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(application)
     val database = getDatabase(application).messageDao
 
     val messages = database.getAllMessages()
@@ -29,6 +34,22 @@ class MessageDatasource(application: Application) {
     fun clearAllMessages() = database.clear()
 
     fun insertAllMessages(vararg m: DatabaseMessage) = database.insertAll(*m)
+
+    fun getRelationFromPreference(): String {
+        return sharedPreferences.getString(
+            application.getString(R.string.pref_friend_key),
+            application.getString(R.string.pref_all_value)
+        ) ?: application.getString(R.string.pref_all_value)
+    }
+
+    fun saveRelationInPreference(valueResource: Int) {
+        sharedPreferences.edit {
+            putString(
+                application.getString(R.string.pref_friend_key),
+                application.getString(valueResource)
+            )
+        }
+    }
 
 
     suspend fun downloadToDatabase(urlString: String, messageNum: Int) {
