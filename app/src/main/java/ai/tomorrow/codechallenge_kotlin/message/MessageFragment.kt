@@ -32,6 +32,11 @@ class MessageFragment : Fragment() {
 
         setupLiveData()
 
+        binding.swipeLayout.setOnRefreshListener {
+            binding.swipeLayout.isRefreshing = true
+            viewModel.resetMessages()
+        }
+
         return binding.root
     }
 
@@ -69,6 +74,7 @@ class MessageFragment : Fragment() {
         if (it.isNullOrEmpty()) {
             binding.emptyTv.visibility = View.VISIBLE
         } else {
+            binding.swipeLayout.isRefreshing = false
             binding.emptyTv.visibility = View.GONE
         }
         adapter.insertNewData(it)

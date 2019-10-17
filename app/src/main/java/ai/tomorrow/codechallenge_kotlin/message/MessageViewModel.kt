@@ -17,7 +17,7 @@ import org.koin.core.KoinComponent
 import org.koin.core.inject
 
 const val CODE_CHALLENGE_URL = "https://codechallenge.secrethouse.party/"
-const val MESSAGE_TOTAL_NUM = 2000
+const val MESSAGE_TOTAL_NUM = 200
 
 enum class MessageType {
     ALL, FRIEND, NOTFRIEND
