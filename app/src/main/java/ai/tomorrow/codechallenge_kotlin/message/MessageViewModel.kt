@@ -14,6 +14,7 @@ import org.koin.core.KoinComponent
 import org.koin.core.inject
 
 const val CODE_CHALLENGE_URL = "https://codechallenge.secrethouse.party/"
+const val MESSAGE_TOTAL_NUM = 200
 
 enum class MessageType {
     ALL, FRIEND, NOTFRIEND
@@ -63,7 +64,15 @@ class MessageViewModel(
     fun resetMessages() {
         uiScope.launch {
             withContext(Dispatchers.IO) {
-                messageRepository.reset(CODE_CHALLENGE_URL, 2000)
+                messageRepository.reset(CODE_CHALLENGE_URL, MESSAGE_TOTAL_NUM)
+            }
+        }
+    }
+
+    fun moreMessages() {
+        uiScope.launch {
+            withContext(Dispatchers.IO) {
+                messageRepository.fetchMore(CODE_CHALLENGE_URL, MESSAGE_TOTAL_NUM)
             }
         }
     }
@@ -82,7 +91,6 @@ class MessageViewModel(
                     _messageType.value =
                         MessageType.NOTFRIEND
             }
-
         }
     }
 

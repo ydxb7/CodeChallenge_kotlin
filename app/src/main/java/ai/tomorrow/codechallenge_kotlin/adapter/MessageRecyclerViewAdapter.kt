@@ -7,8 +7,16 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import java.text.SimpleDateFormat
 
-class MessageRecyclerViewAdapter(private var mData: List<DatabaseMessage>) :
+class MessageRecyclerViewAdapter(
+    private var mData: List<DatabaseMessage>,
+    private val mOnLoadMoreItemsListener: OnLoadMoreItemsListener
+) :
     RecyclerView.Adapter<MessageRecyclerViewAdapter.ViewHolder>() {
+
+    interface OnLoadMoreItemsListener {
+        fun onLoadMoreItems()
+    }
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         return ViewHolder(
             ListItemBinding.inflate(
@@ -25,6 +33,9 @@ class MessageRecyclerViewAdapter(private var mData: List<DatabaseMessage>) :
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val message = mData[position]
         holder.bind(position, message)
+        if (position == itemCount - 10) {
+            mOnLoadMoreItemsListener.onLoadMoreItems()
+        }
     }
 
     fun setData(newData: List<DatabaseMessage>) {

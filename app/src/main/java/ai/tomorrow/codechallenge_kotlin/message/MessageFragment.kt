@@ -28,7 +28,13 @@ class MessageFragment : Fragment() {
 
         binding.lifecycleOwner = this
 
-        adapter = MessageRecyclerViewAdapter(ArrayList())
+        adapter = MessageRecyclerViewAdapter(
+            ArrayList(),
+            object : MessageRecyclerViewAdapter.OnLoadMoreItemsListener {
+                override fun onLoadMoreItems() {
+                    viewModel.moreMessages()
+                }
+            })
         binding.recyclerView.adapter = adapter
 
 

@@ -26,8 +26,8 @@ class MessageRepository(val messageDatasource: MessageDatasource) {
         }
     }
 
-    suspend fun fetchNew(urlString: String, totoalNum: Int) {
-        messageDatasource.downloadToDatabase(urlString, totoalNum)
+    suspend fun fetchMore(urlString: String, totalNum: Int) {
+        messageDatasource.downloadToDatabase(urlString, totalNum)
     }
 
 }
