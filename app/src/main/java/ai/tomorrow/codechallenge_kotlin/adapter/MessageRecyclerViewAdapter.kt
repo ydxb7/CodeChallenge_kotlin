@@ -28,8 +28,14 @@ class MessageRecyclerViewAdapter(private var mData: List<DatabaseMessage>) :
     }
 
     fun setData(newData: List<DatabaseMessage>) {
+        val oldSize = mData.size
+        val newSize = newData.size
         mData = newData
-        notifyDataSetChanged()
+        if (oldSize < newSize) {
+            notifyItemRangeInserted(oldSize, newSize - oldSize)
+        } else {
+            notifyDataSetChanged()
+        }
     }
 
     class ViewHolder(private val binding: ListItemBinding) : RecyclerView.ViewHolder(binding.root) {

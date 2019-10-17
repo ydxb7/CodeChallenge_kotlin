@@ -15,6 +15,6 @@ interface MessageDao {
     fun clear()
 
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
     fun insertAll(vararg messages: DatabaseMessage)
 }

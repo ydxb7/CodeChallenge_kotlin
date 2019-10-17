@@ -28,7 +28,7 @@ class MainViewModel(
     fun resetMessages() {
         uiScope.launch {
             withContext(Dispatchers.IO) {
-                messageRepository.reset(CODE_CHALLENGE_URL, 200)
+                messageRepository.reset(CODE_CHALLENGE_URL, 2000)
             }
         }
     }

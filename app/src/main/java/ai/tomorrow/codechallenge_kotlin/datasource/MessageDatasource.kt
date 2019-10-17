@@ -7,6 +7,8 @@ import ai.tomorrow.codechallenge_kotlin.utils.NoNewLineInputStreamReader
 import android.app.Application
 import android.util.JsonReader
 import android.util.Log
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import java.io.IOException
 import java.io.InputStream
 import java.net.URL
@@ -15,7 +17,7 @@ import javax.net.ssl.HttpsURLConnection
 class MessageDatasource(application: Application) {
 
     private val TAG = "MessageDatasource"
-
+    private val mutex = Mutex()
     val database = getDatabase(application).messageDao
 
     val messages = database.getAllMessages()
@@ -25,53 +27,60 @@ class MessageDatasource(application: Application) {
     fun insertAllMessages(vararg m: DatabaseMessage) = database.insertAll(*m)
 
 
-    fun downloadUrl(urlString: String, messageNum: Int): List<DatabaseMessage>? {
-        Log.d(TAG, "downloadUrl")
-        val url = URL(urlString)
-        var stream: InputStream? = null
-        var connection: HttpsURLConnection? = null
-        val messages = ArrayList<DatabaseMessage>()
-        try {
-            connection = url.openConnection() as HttpsURLConnection
-            // Timeout for reading InputStream arbitrarily set to 3000ms.
-            connection.readTimeout = 3000
-            // Timeout for connection.connect() arbitrarily set to 3000ms.
-            connection.connectTimeout = 3000
-            // For this use case, set HTTP method to GET.
-            connection.requestMethod = "GET"
-            // Already true by default but setting just in case; needs to be true since this request
-            // is carrying an input (response) body.
-            connection.doInput = true
-            // Open communications link (network traffic occurs here).
-            connection.connect()
-            val responseCode = connection.responseCode
-            if (responseCode != HttpsURLConnection.HTTP_OK) {
-                throw IOException("HTTP error code: $responseCode")
-            }
-            // Retrieve the response body as an InputStream.
-            stream = connection.inputStream
-            if (stream != null) {
-
-                val noNewLineInputStreamReader = NoNewLineInputStreamReader(stream, "UTF-8")
-                val reader = JsonReader(noNewLineInputStreamReader)
-//                val reader = JsonReader(InputStreamReader(stream, "UTF-8"))
-                reader.isLenient = true
-
-                while (reader.hasNext() && messages.size < messageNum) {
-                    val message = readMessage(reader)
-                    if (message != null) {
-                        messages.add(message)
-                    }
-                    Log.d(TAG, "messages.size = ${messages.size}")
+    suspend fun downloadToDatabase(urlString: String, messageNum: Int) {
+        mutex.withLock {
+            Log.d(TAG, "downloadUrl")
+            val url = URL(urlString)
+            var stream: InputStream? = null
+            var connection: HttpsURLConnection? = null
+            val messages = ArrayList<DatabaseMessage>()
+            var num = 0
+            try {
+                connection = url.openConnection() as HttpsURLConnection
+                // Timeout for reading InputStream arbitrarily set to 3000ms.
+                connection.readTimeout = 3000
+                // Timeout for connection.connect() arbitrarily set to 3000ms.
+                connection.connectTimeout = 3000
+                // For this use case, set HTTP method to GET.
+                connection.requestMethod = "GET"
+                // Already true by default but setting just in case; needs to be true since this request
+                // is carrying an input (response) body.
+                connection.doInput = true
+                // Open communications link (network traffic occurs here).
+                connection.connect()
+                val responseCode = connection.responseCode
+                if (responseCode != HttpsURLConnection.HTTP_OK) {
+                    throw IOException("HTTP error code: $responseCode")
                 }
-                reader.close()
+                // Retrieve the response body as an InputStream.
+                stream = connection.inputStream
+                if (stream != null) {
+
+                    val noNewLineInputStreamReader = NoNewLineInputStreamReader(stream, "UTF-8")
+                    val reader = JsonReader(noNewLineInputStreamReader)
+                    reader.isLenient = true
+
+                    while (reader.hasNext() && ++num < messageNum) {
+                        val message = readMessage(reader)
+                        if (message != null) {
+                            messages.add(message)
+                            if (num % 100 == 0) {
+                                insertAllMessages(*messages.toTypedArray())
+                                messages.clear()
+                            }
+                        }
+                        Log.d(TAG, "messages.size = ${messages.size}")
+                    }
+                    insertAllMessages(*messages.toTypedArray())
+                    reader.close()
+                }
+            } finally {
+                // Close Stream and disconnect HTTPS connection.
+                stream?.close()
+                connection?.disconnect()
             }
-        } finally {
-            // Close Stream and disconnect HTTPS connection.
-            stream?.close()
-            connection?.disconnect()
         }
-        return messages
+
     }
 
     private fun readMessage(reader: JsonReader): DatabaseMessage? {
