@@ -28,6 +28,11 @@ class MessageRecyclerViewAdapter(private var mData: List<DatabaseMessage>) :
     }
 
     fun setData(newData: List<DatabaseMessage>) {
+        mData = newData
+        notifyDataSetChanged()
+    }
+
+    fun insertNewData(newData: List<DatabaseMessage>) {
         val oldSize = mData.size
         val newSize = newData.size
         mData = newData

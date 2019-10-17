@@ -1,11 +1,8 @@
 package ai.tomorrow.codechallenge_kotlin.message
 
-import ai.tomorrow.codechallenge_kotlin.SettingDialogFragment
 import ai.tomorrow.codechallenge_kotlin.adapter.MessageRecyclerViewAdapter
 import ai.tomorrow.codechallenge_kotlin.databinding.MessageFragmentBinding
-import ai.tomorrow.codechallenge_kotlin.viewmodel.MainViewModel
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -18,7 +15,7 @@ class MessageFragment : Fragment() {
     private val TAG = "MessageFragment"
 
     private lateinit var binding: MessageFragmentBinding
-    private val viewModel: MainViewModel by viewModel()
+    private val viewModel: MessageViewModel by viewModel()
     private lateinit var adapter: MessageRecyclerViewAdapter
 
     override fun onCreateView(
@@ -35,22 +32,57 @@ class MessageFragment : Fragment() {
 
 
         binding.settingIv.setOnClickListener {
-            val settingDialogFragment = SettingDialogFragment()
+            val settingDialogFragment =
+                SettingDialogFragment()
             settingDialogFragment.show(
                 requireNotNull(fragmentManager),
                 SettingDialogFragment::class.simpleName
             )
         }
 
-
-        viewModel.messages.observe(this, Observer {
-            Log.d(TAG, "message.size = ${it.size}")
-//            Log.d(TAG, "binding.textView = ${binding.mainTv}")
-
-            adapter.setData(it)
-//            binding.mainTv.text = it.toString()
+        viewModel.messageType.observe(this, Observer {
+            when (it) {
+                MessageType.ALL -> showAllMessages()
+                MessageType.FRIEND -> showFriendMessages()
+                MessageType.NOTFRIEND -> showNotFriendMessages()
+            }
         })
 
+
         return binding.root
+    }
+
+    private fun showAllMessages() {
+        if (viewModel.messagesAll.value != null) {
+            adapter.setData(requireNotNull(viewModel.messagesAll.value))
+        } else {
+            adapter.setData(ArrayList())
+        }
+        viewModel.messagesAll.observe(this, Observer {
+            adapter.insertNewData(it)
+        })
+    }
+
+    private fun showFriendMessages() {
+        if (viewModel.messagesFriend.value != null) {
+            adapter.setData(requireNotNull(viewModel.messagesFriend.value))
+        } else {
+            adapter.setData(ArrayList())
+        }
+
+        viewModel.messagesFriend.observe(this, Observer {
+            adapter.insertNewData(it)
+        })
+    }
+
+    private fun showNotFriendMessages() {
+        if (viewModel.messagesNoFriend.value != null) {
+            adapter.setData(requireNotNull(viewModel.messagesNoFriend.value))
+        } else {
+            adapter.setData(ArrayList())
+        }
+        viewModel.messagesNoFriend.observe(this, Observer {
+            adapter.insertNewData(it)
+        })
     }
 }

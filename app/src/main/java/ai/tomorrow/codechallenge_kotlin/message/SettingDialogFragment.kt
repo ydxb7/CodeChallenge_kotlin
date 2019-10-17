@@ -1,5 +1,6 @@
-package ai.tomorrow.codechallenge_kotlin
+package ai.tomorrow.codechallenge_kotlin.message
 
+import ai.tomorrow.codechallenge_kotlin.R
 import ai.tomorrow.codechallenge_kotlin.databinding.SettingDialogFragmentBinding
 import ai.tomorrow.codechallenge_kotlin.repository.MessageRepository
 import android.os.Bundle
